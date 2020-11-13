@@ -1,12 +1,25 @@
 from blockchain import block 
+from blockchain import blockchain
+import sys
+
+
+class CommandLine:
+    blockchain = blockchain.Blockchain
+
+    def printUsage(self):
+        print("Usage:")
+        print(" add -block BLOCK_DATA - add a block to the chain")
+        print(" print - Prints the blocks in the chain")
+
+    def validateArgs(self):
+        if len(sys.argv) < 2:
+            self.printUsage()
+            sys.exit()
 
 
 def main():
     chain = block.initBlockchain()
 
-    chain.addBlock("First Block after Genesis")
-    chain.addBlock("Second Block after Genesis")
-    chain.addBlock("Third Block after Genesis")
 
     for blocks in chain.blocks:
         print("Previous Hash: ",blocks.prevHash)
@@ -18,3 +31,7 @@ def main():
         print()
         
 main()
+
+
+print("number: ",len(sys.argv))
+

@@ -5,17 +5,37 @@ import pickledb
 dbPath = "./tmp/blocks/blockchain.db"
 
 class Blockchain:
-    blocks = []
 
-    def __init__(self,block):
-        self.blocks.append(block)
+    def __init__(self,lastHash,db):
+        self.lastHash = lastHash
+        self.database = db
 
     def addBlock(self, data):
-        prevBlock = self.blocks[len(self.blocks)-1]
-        new = block.createBlock(data,prevBlock.hash)
-        self.blocks.append(new)
+        lastHash = self.database.get("lh")
+        newBlock = block.createBlock(data,lastHash)
+        self.database.set("lh",newBlock.hash)
+        self.lastHash = newBlock.hash
+        self.database.dump()
+
+    def iterator(self):
+        iter = BlockchainIterator(self.lastHash,self.database)
+        return iter
+
+class BlockchainIterator:
+    
+    def __init__(self,currentHash, database):
+        self.currentHash = currentHash
+        self.database = database
+
+    def next(self):
+        encodedBlock = self.database.get(self.currentHash)
+        blk = block.deserialize(encodedBlock)
+        self.currentHash = blk.prevHash
+        return blk
+
 
 def initBlockchain():
+    lastHash = []
     db = pickledb.load(dbPath,False)
     if db.exists("lh"):
         print("No existing blockchain found")
@@ -25,3 +45,8 @@ def initBlockchain():
         db.append("lh",genesis.hash)
         lastHash = genesis.hash
         db.dump()
+    else:
+        lastHash = db.get("lh")
+
+    blockchain = Blockchain(lastHash,db)
+    return blockchain

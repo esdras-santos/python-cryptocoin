@@ -4,15 +4,12 @@ import pickle
 
 
 class Block:
-    hash = []
-    data = []
-    prevHash = []
-    nonce = 0
 
     def __init__(self, data, prevHash,nonce):
         self.data = data
         self.prevHash = prevHash
         self.nonce = nonce
+        self.hash = []
 
     def newProof(self):
         target = 1
